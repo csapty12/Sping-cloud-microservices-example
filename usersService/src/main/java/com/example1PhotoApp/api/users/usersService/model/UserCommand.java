@@ -5,7 +5,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotNull;
 
 @ToString
-public class User {
+public class UserCommand {
 
     private Integer id;
 

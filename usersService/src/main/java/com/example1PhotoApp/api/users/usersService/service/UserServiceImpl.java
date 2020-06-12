@@ -1,7 +1,8 @@
 package com.example1PhotoApp.api.users.usersService.service;
 
 import com.example1PhotoApp.api.users.usersService.entity.UserEntity;
-import com.example1PhotoApp.api.users.usersService.model.User;
+import com.example1PhotoApp.api.users.usersService.model.UserCommand;
+import com.example1PhotoApp.api.users.usersService.model.UserResponse;
 import com.example1PhotoApp.api.users.usersService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,22 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public User createUser(User user) {
+    public UserResponse createUser(UserCommand userCommand) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setFirstName(user.getFirstName());
-        userEntity.setLastName(user.getLastName());
-        userEntity.setEmail(user.getEmail());
-        userEntity.setPassword(user.getPassword());
-        userRepository.save(userEntity);
-        return user;
+        userEntity.setFirstName(userCommand.getFirstName());
+        userEntity.setLastName(userCommand.getLastName());
+        userEntity.setEmail(userCommand.getEmail());
+        userEntity.setPassword(userCommand.getPassword());
+        UserEntity savedUser = userRepository.save(userEntity);
+
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(savedUser.getId());
+        userResponse.setFirstName(savedUser.getFirstName());
+        userResponse.setLastName(savedUser.getLastName());
+        userResponse.setPassword(savedUser.getPassword());
+        userResponse.setEmail(savedUser.getEmail());
+
+        return userResponse;
     }
 }
