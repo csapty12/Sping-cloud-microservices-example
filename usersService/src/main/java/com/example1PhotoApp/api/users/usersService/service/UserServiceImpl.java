@@ -5,8 +5,13 @@ import com.example1PhotoApp.api.users.usersService.model.UserCommand;
 import com.example1PhotoApp.api.users.usersService.model.UserResponse;
 import com.example1PhotoApp.api.users.usersService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,5 +40,37 @@ public class UserServiceImpl implements UserService {
         userResponse.setEmail(savedUser.getEmail());
 
         return userResponse;
+    }
+
+    @Override
+    public UserResponse getUserByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .map(entity -> {
+                    UserResponse userResponse = new UserResponse();
+                    userResponse.setId(entity.getId());
+                    userResponse.setFirstName(entity.getFirstName());
+                    userResponse.setLastName(entity.getLastName());
+                    userResponse.setPassword(entity.getPassword());
+                    return userResponse;
+                })
+        .orElseThrow(()-> new UsernameNotFoundException("user with email: " + email  + " not found"));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User with email : " + email + " not found."));
+        return new User(
+                userEntity.getEmail(),
+                userEntity.getPassword(),
+                true,
+                true,
+                true,
+                true,
+                new ArrayList<>()
+        );
     }
 }
